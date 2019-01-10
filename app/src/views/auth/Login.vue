@@ -6,6 +6,11 @@
     <button @click="login">Login</button>
 
     <hr />
+    <div>
+      <p>or Signin with:</p>
+      <button @click="loginWith('github')">Signin with Github</button>
+    </div>
+    <hr />
     <router-link :to="{ name: 'signup' }"
       >Don't have an account? Signup</router-link
     ><br />
@@ -15,6 +20,11 @@
 
 <script>
 import firebase from "firebase";
+const getFirebaseAuthProvider = function(provider) {
+  if(provider === "github") {
+    return new firebase.auth.GithubAuthProvider()
+  }
+};
 
 export default {
   name: "login",
@@ -27,13 +37,26 @@ export default {
   methods: {
     async login() {
       try {
-        let user = await firebase
+        let res = await firebase
           .auth()
           .signInWithEmailAndPassword(this.email, this.password);
-        alert(`Connected! ${user.email}`);
+        alert(`Connected!`);
+        console.log(res);
+
         this.$router.replace("app");
       } catch (err) {
         alert(`Oops! ${err.message}`);
+      }
+    },
+    async loginWith(providerName) {
+      try {
+        let provider = getFirebaseAuthProvider(providerName);
+        let res = await firebase.auth().signInWithPopup(provider);
+        console.log(res);
+        this.$router.replace("app");
+      } catch (err) {
+        console.log(err);
+        alert("Oop something went wrong");
       }
     }
   }
