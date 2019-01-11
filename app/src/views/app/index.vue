@@ -9,8 +9,8 @@
     </div>
 
     <div class="o-skeleton__body">
-      <h1>App homepage</h1>
-      <button @click="logout">Logout</button>
+      <h1>Welcome App homepage</h1>
+      <button @click="handleLogout">Logout</button>
     </div>
 
     <div class="o-skeleton__tip">Footer</div>
@@ -19,13 +19,21 @@
 
 <script>
 import firebase from "firebase";
-
+import { mapState, mapActions } from "vuex";
 export default {
   name: "app-home",
+  computed: {
+    ...mapState({
+      user: state => state.user,
+    })
+  },
   methods: {
-    async logout() {
+    ...mapActions({
+      logout: 'logout'
+    }),
+    async handleLogout() {
       try {
-        await firebase.auth().signOut();
+        await this.logout();
         alert("logged out");
         this.$router.replace("/");
       } catch (err) {

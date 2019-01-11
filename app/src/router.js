@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
 import firebase from "firebase";
+import store from "./store.js";
 
 Vue.use(Router);
 
@@ -29,12 +30,18 @@ const router = new Router({
     {
       path: "/login",
       name: "login",
+      meta: {
+        notForLoggedInUser: true
+      },
       component: () =>
         import(/* webpackChunkName: "about" */ "./views/auth/Login.vue")
     },
     {
       path: "/signup",
       name: "signup",
+      meta: {
+        notForLoggedInUser: true
+      },
       component: () =>
         import(/* webpackChunkName: "about" */ "./views/auth/Signup.vue")
     },
@@ -50,12 +57,21 @@ const router = new Router({
   ]
 });
 
-router.beforeEach((to, from, next) => {
-  const currentUser = firebase.auth().currentUser;
-  const viewRequiresAuth = to.matched.some(route => route.meta.requiresAuth);
+router.beforeEach( async (to, from, next) => {
+  console.log('test')
+  if(!store.state.user.authenticated){
+    await store.dispatch('checkAuthState');
+    console.log('test 2')
+  }
 
+  const currentUser = store.state.user.authenticated;
+  const viewRequiresAuth = to.matched.some(route => route.meta.requiresAuth);
+  const isAuthenticationView = to.matched.some(router => router.meta.notForLoggedInUser);
   if (viewRequiresAuth && !currentUser) {
     next("login");
+  } else if (!viewRequiresAuth && isAuthenticationView && currentUser) {
+    console.log('asd')
+    next(from.path);
   } else {
     next();
   }

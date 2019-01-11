@@ -8,10 +8,9 @@ import "./utils/firebase";
 
 Vue.config.productionTip = false;
 
-firebase.auth().onAuthStateChanged(() => {
-  new Vue({
-    router,
-    store,
-    render: h => h(App)
-  }).$mount("#app");
-});
+
+new Vue({
+  router,
+  store,
+  render: h => h(App)
+}).$mount("#app");

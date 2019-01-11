@@ -4,6 +4,7 @@
     <input type="text" placeholder="Email" v-model="email" />
     <input type="text" placeholder="Password" v-model="password" />
     <button @click="login">Login</button>
+    <button @click="vuexLoginHandler">VuexLogin</button>
 
     <hr />
     <div>
@@ -20,9 +21,10 @@
 
 <script>
 import firebase from "firebase";
+import { mapActions } from "vuex"
 const getFirebaseAuthProvider = function(provider) {
-  if(provider === "github") {
-    return new firebase.auth.GithubAuthProvider()
+  if (provider === "github") {
+    return new firebase.auth.GithubAuthProvider();
   }
 };
 
@@ -35,6 +37,15 @@ export default {
     };
   },
   methods: {
+    ...mapActions({
+      vuexLogin: 'login'
+    }),
+    vuexLoginHandler(){
+      console.log('trying')
+      this.$store.dispatch('login', {email: this.email, pw: this.password})
+      console.log('ys')
+      this.$router.replace("app");
+    },
     async login() {
       try {
         let res = await firebase
